@@ -152,6 +152,8 @@ const tree = StateTree({
 tree.set('foo', 'bar2');
 tree.flushChanges(); // { foo: true }
 tree.set('list.0.foo', 'bar2');
+
+// It returns an object representing the changes
 tree.flushChanges(); // { list: { 0: { foo: true } } }
 ```
 
