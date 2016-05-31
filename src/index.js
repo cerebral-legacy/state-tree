@@ -121,7 +121,7 @@ function StateTree(initialState) {
 
   function hasChanged(path, changes) {
     return path.split('.').reduce(function (changes, key) {
-      return changes[key];
+      return changes ? changes[key] : false;
     }, changes);
   }
 

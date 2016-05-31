@@ -21,7 +21,7 @@ module.exports = function (Component, paths) {
       for (var key in paths) {
         if (
           (typeof paths[key] === 'object' && paths[key].hasChanged(changes)) ||
-          (hasChanged(paths[key], changes))
+          (typeof paths[key] !== 'object' && hasChanged(paths[key], changes))
         ) {
           return this.forceUpdate();
         }
