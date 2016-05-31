@@ -131,6 +131,7 @@ const tree = StateTree({
 });
 
 tree.set('foo', 'bar2');
+tree.merge('foo', {something: 'cool'});
 tree.unset('foo');
 tree.push('list', 'something');
 tree.pop('list');
@@ -195,3 +196,62 @@ const tree = StateTree({
 tree.set('users.0.name', 'woop');
 tree.flushChanges(); // { users: { 0: true }, posts: { 0: { user: true } } }
 ```
+
+### Computed
+You can also compute state.
+
+```js
+import StateTree from 'state-tree';
+const tree = StateTree({
+  foo: 'bar'
+});
+
+const myComputed = tree.computed({
+  foo: 'foo' // The deps, just like a component
+}, state => {
+  return state.foo + '!!!';
+});
+
+myComputed.get() // "bar!!!"
+let changes = tree.flushChanges(); // {}
+myComputed.hasChanged(changes); // false
+tree.set('foo', 'bar2');
+changes = tree.flushChanges(); // { foo: true }
+myComputed.hasChanged(changes); // true
+myComputed.get() // "bar2!!!"
+```
+So, this seems like a lot of code to make computed work, but again, this is low level. Implemented in the HOC of React you can simply do this.
+
+```js
+import React from 'react';
+import HOC from 'state-tree/react/HOC';
+import addItem from './addItem';
+import awesomeItems from './computed/awesomeItems';
+
+function Items(props) {
+  return (
+    <div>
+      <button onClick={() => addItem({foo: 'bar'})}>Add item</button>
+      <ul>
+        {props.list.map((item, index) => <li key={index}>{item.foo}</li>)}
+      </ul>
+    </div>
+  );
+}
+
+export default HOC(Items, {
+  list: awesomeItems
+})
+```
+And *awesomeItems.js* would look like:
+```js
+import tree from './tree';
+
+export default tree.computed({
+  list: 'list' // Define its deps
+}, state => {
+  return state.list.filter(item => item.isAwesome);
+});
+```
+
+There is no magic going on here. The components will pass in the flushed "change tree" to whatever computed they have. This is what tells them to verify if an update is necessary, if not already ready to calculate a new value.
