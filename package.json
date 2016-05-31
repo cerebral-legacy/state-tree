@@ -1,6 +1,6 @@
 {
   "name": "state-tree",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A state tree that handles reference updates and lets you flush a description of changes",
   "main": "src/index.js",
   "directories": {

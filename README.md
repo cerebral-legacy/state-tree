@@ -1,4 +1,4 @@
-# state-tree
+# state-tree (EXPERIMENTAL)
 A state tree that handles reference updates and lets you flush a description of changes
 
 ### Why?
