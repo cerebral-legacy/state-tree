@@ -11,6 +11,60 @@ There are different ways of handling state. You have libraries like [Baobab](htt
 
 So here we are. I want a single state tree that has controlled mutations, allowing referencing and emits what changed along with any deps. **This is rather low level code that would require abstractions for a good API, but it is a start :-)**
 
+### Building a small app
+*tree.js*
+```js
+import StateTree from 'state-tree';
+
+export default StateTree({
+  list: []
+});
+```
+
+*addItem.js*
+```js
+import tree from './tree';
+export default addItem(item) {
+  tree.push('list', item);
+}
+```
+
+*Items.js*
+```js
+import React from 'react';
+import HOC from 'state-tree/react/HOC';
+import addItem from './addItem';
+
+function Items(props) {
+  return (
+    <div>
+      <button onClick={() => addItem({foo: 'bar'})}>Add item</button>
+      <ul>
+        {props.list.map((item, index) => <li key={index}>{item.foo}</li>)}
+      </ul>
+    </div>
+  );
+}
+
+export default HOC(Items, {
+  list: 'list'
+})
+```
+
+*main.js*
+```js
+import React, {render} from 'react';
+import Container from 'state-tree/react/Container';
+import tree from './tree';
+import Items from './Items';
+
+render((
+  <Container tree={tree}>
+    <Items />
+  </Container>
+), document.querySelector('#app'));
+```
+
 ### API
 
 #### Instantiate
