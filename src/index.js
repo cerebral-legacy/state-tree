@@ -95,29 +95,35 @@ function setReferences(rootObj, basePath) {
   return traverse(rootObj, basePath);
 }
 
-module.exports = function (initialState) {
+function StateTree(initialState) {
   var state = setReferences(initialState, []);
   var changes = {};
 
-function updateChanges(host, key, specificPath) {
-  function update(pathArray) {
-    return function (currentPath, key, index) {
-      if (Array.isArray(key)) {
-        key = key[0].indexOf(key[1]);
-        currentPath[key] = index === pathArray.length - 1 ? true : {};
-      } else if (index === pathArray.length - 1 && !currentPath[key]) {
-        currentPath[key] = true;
-      } else if (index < pathArray.length - 1) {
-        currentPath[key] = typeof currentPath[key] === 'object' ? currentPath[key] : {};
+  function updateChanges(host, key, specificPath) {
+    function update(pathArray) {
+      return function (currentPath, key, index) {
+        if (Array.isArray(key)) {
+          key = key[0].indexOf(key[1]);
+          currentPath[key] = index === pathArray.length - 1 ? true : {};
+        } else if (index === pathArray.length - 1 && !currentPath[key]) {
+          currentPath[key] = true;
+        } else if (index < pathArray.length - 1) {
+          currentPath[key] = typeof currentPath[key] === 'object' ? currentPath[key] : {};
+        }
+        return currentPath[key];
       }
-      return currentPath[key];
     }
+    host['.referencePaths'].forEach(function (path) {
+      var pathArray = path ? path.concat(key) : [key];
+      pathArray.reduce(update(pathArray), changes);
+    });
   }
-  host['.referencePaths'].forEach(function (path) {
-    var pathArray = path ? path.concat(key) : [key];
-    pathArray.reduce(update(pathArray), changes);
-  });
-}
+
+  function hasChanged(path, changes) {
+    return path.split('.').reduce(function (changes, key) {
+      return changes[key];
+    }, changes);
+  }
 
   return {
     get: function (path) {
@@ -188,6 +194,26 @@ function updateChanges(host, key, specificPath) {
       host[key].pop();
       updateChanges(host[key], String(lastIndex), path);
     },
+    merge: function () {
+      var path;
+      var value;
+      if (arguments.length === 1) {
+        path = '';
+        value = arguments[0];
+      } else {
+        path = arguments[0];
+        value = arguments[1];
+      }
+      var pathArray = path.split('.');
+      var key = pathArray.pop();
+      var host = getByPath(pathArray, state);
+      var child = host[key] || host;
+      Object.keys(value).forEach(function (mergeKey) {
+        cleanReferences(child[mergeKey], state, key ? path.split('.').concat(mergeKey) : [mergeKey]);
+        child[mergeKey] = setReferences(value[mergeKey], key ? pathArray.concat(key, mergeKey) : [mergeKey]);
+        updateChanges(child, mergeKey, path);
+      });
+    },
     subscribe: function (cb) {
       subscribers.push(cb);
     },
@@ -201,6 +227,46 @@ function updateChanges(host, key, specificPath) {
         cb(flushedChanges);
       });
       return flushedChanges;
+    },
+    computed: function (deps, cb) {
+      var computedHasChanged = true;
+      var value = null;
+      return {
+        get: function (changes) {
+          if (computedHasChanged) {
+            computedHasChanged = false;
+            value = cb(Object.keys(deps).reduce(function (props, key) {
+              var path = deps[key].split('.');
+              props[key] = getByPath(path, state);
+              return props;
+            }, {}));
+            return value;
+          } else {
+            return value;
+          }
+        },
+        // Can optimize by remembering the changes in case multiple
+        // components checks the computed, but very unlikely
+        hasChanged: function (changes) {
+          if (computedHasChanged) {
+            return true;
+          }
+          for (var key in deps) {
+            if (hasChanged(deps[key], changes)) {
+              computedHasChanged = true;
+              return true;
+            }
+          }
+          return false;
+        }
+      }
     }
   };
 };
+
+/*
+- Create computed
+- ComponentWillMount, subscribe to computed
+*/
+
+module.exports = StateTree;

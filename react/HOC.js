@@ -1,6 +1,6 @@
 var React = require('react');
 
-function hasPath(path, changes) {
+function hasChanged(path, changes) {
   return path.split('.').reduce(function (changes, key) {
     return changes[key];
   }, changes);
@@ -19,7 +19,10 @@ module.exports = function (Component, paths) {
     },
     update(changes) {
       for (var key in paths) {
-        if (hasPath(paths[key], changes)) {
+        if (
+          (typeof paths[key] === 'object' && paths[key].hasChanged(changes)) ||
+          (hasChanged(paths[key], changes))
+        ) {
           return this.forceUpdate();
         }
       }
@@ -28,7 +31,7 @@ module.exports = function (Component, paths) {
       var tree = this.context.tree;
       var props = this.props || {};
       var propsToPass = Object.keys(paths || {}).reduce(function (props, key) {
-        props[key] = tree.get(paths[key]);
+        props[key] = typeof paths[key] === 'object' ? paths[key].get() : tree.get(paths[key]);
         return props
       }, {})
 
