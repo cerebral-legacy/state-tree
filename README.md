@@ -75,7 +75,7 @@ With the flushed changes you decide when it is time to update the interface. You
 ```js
 tree.subscribe(function (changes) {
   var hasUpdate = listPath.reduce(function (changes, key) {
-    return changes && changes[key];
+    return changes[key];
   }, changes); // undefined
   if (hasUpdate) {
     component.forceUpdate();
