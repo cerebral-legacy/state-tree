@@ -1,0 +1,29 @@
+{
+  "name": "state-tree",
+  "version": "0.1.0",
+  "description": "A state tree that handles reference updates and lets you flush a description of changes",
+  "main": "src/index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "nodeunit tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/christianalfoni/state-tree.git"
+  },
+  "keywords": [
+    "state",
+    "reference"
+  ],
+  "author": "Christian Alfoni",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/christianalfoni/state-tree/issues"
+  },
+  "homepage": "https://github.com/christianalfoni/state-tree#readme",
+  "devDependencies": {
+    "nodeunit": "^0.9.1"
+  }
+}
