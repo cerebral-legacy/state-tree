@@ -1,3 +1,5 @@
+var subscribers = [];
+
 function getByPath(path, state) {
   return path.reduce(function (currentPath, key) {
     return currentPath[key];
@@ -186,9 +188,18 @@ function updateChanges(host, key, specificPath) {
       host[key].pop();
       updateChanges(host[key], String(lastIndex), path);
     },
-    flushChanges() {
+    subscribe: function (cb) {
+      subscribers.push(cb);
+    },
+    unsubscribe: function (cb) {
+      subscribers.splice(subscribers.indexOf(cb), 1);
+    },
+    flushChanges: function() {
       var flushedChanges = changes;
       changes = {};
+      subscribers.forEach(function (cb) {
+        cb(flushedChanges);
+      });
       return flushedChanges;
     }
   };

@@ -68,16 +68,18 @@ tree.flushChanges(); // { list: { 0: { foo: true } } }
 
 With the flushed changes you decide when it is time to update the interface. You can use this flushed change tree with abstractions in your UI. An example could be:
 
-- Trigger a "change" event with the flushed changes
-- Components listens to this "change" event
-- Components are registered to specific paths, like "list"
+- Subscribe to flushes on the tree in a component wrapper
+- Component wrapper are registered to specific paths, like `{ someList: 'foo.bar.list' }`
 - You can now:
 
 ```js
-something.on('change', function (changes) {
-  var hasUpdate = componentPath.reduce(function (changes, key) {
+tree.subscribe(function (changes) {
+  var hasUpdate = listPath.reduce(function (changes, key) {
     return changes && changes[key];
   }, changes); // undefined
+  if (hasUpdate) {
+    component.forceUpdate();
+  }
 })
 ```
 
