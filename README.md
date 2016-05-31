@@ -5,11 +5,44 @@ A state tree that handles reference updates and lets you flush a description of 
 There are different ways of handling state. You have libraries like [Baobab](https://github.com/Yomguithereal/baobab) and [Mobx](https://github.com/mobxjs/mobx). They are part of the same domain, but they handle state changes very differently. From experience this is what I want:
 
 - **One state tree**. It just keeps a much clearer mental image and I never get into circular dependencies with my state models. It is also easier to hydrate and rehydrate the state of my app
-- **Fast updates**. Immutability has benefits like being able to replay state changes, undo/redo very easily and no unwanted mutations in other parts of your code. The problem though is that immutability is slow on instantiating large datasets
-- **Referencing**. Immutability breaks referencing. Meaning that if one object references an other object and that object changes, the other object is not updated. This is a good thing from one perspective, but when it comes to handling relational data it is problematic. You have to create normalizing abstractions which can be hard to reason about
-- **Where did it change?**. When we have referencing it is not enough just to be able to update the objects across each other, we also have to know that if object A changed and object B references it, object B also has a change. This can be done with observables/observers in Mobx, but Mobx is not built for single state trees
 
-So here we are. I want a single state tree that has controlled mutations, allowing referencing and emits what changed along with any deps. **This is rather low level code that would require abstractions for a good API, but it is a start :-)**
+- **Fast updates**. Immutability has benefits like being able to replay state changes, undo/redo very easily and no unwanted mutations in other parts of your code. The problem though is that immutability is slow on instantiating large datasets
+
+- **Referencing**. Immutability breaks referencing. Meaning that if one object references an other object and that object changes, the other object is not updated. This is a good thing from one perspective, but when it comes to handling relational data it is problematic. You have to create normalizing abstractions which can be hard to reason about
+
+- **Where did it change?**. When we have referencing it is not enough to update objects across each other, we also have to know if a change to object A affects object B, object B also has a change. This is what Mobx does a really great job on, but it is not a single state tree
+
+So here we are. I want a single state tree that has controlled mutations, allowing referencing and emits what changed along with any references. **This is rather low level code that would require abstractions for a good API, but it is a start :-)**
+
+Translated into code:
+
+```js
+const tree = StateTree({
+  title: 'Whatap!',
+  contacts: contacts,
+  posts: []
+});
+
+function addPost() {
+  // We just add a new post and reference
+  // a user from somewhere else in our state tree
+  tree.push('posts', {
+    title: 'Some post',
+    user: tree.get('contacts.0')
+  });
+  tree.flushChanges(); // Components subscribes to these flushes
+}
+
+function changeName() {
+  // We change the user in the contacts
+  tree.set('contacts.0.name', 'Just a test');
+
+  // The component subscribing to "posts" will still
+  // be notified about an update because one of the posts
+  // has this user referenced
+  tree.flushChanges();
+}
+```
 
 ### Building a small app
 *tree.js*
