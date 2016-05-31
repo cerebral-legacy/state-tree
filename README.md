@@ -6,7 +6,7 @@ There are different ways of handling state. You have libraries like [Baobab](htt
 
 - **One state tree**. It just keeps a much clearer mental image and I never get into circular dependencies with my state models. It is also easier to hydrate and dehydrate the state of my app
 
-- **Control changes**. I want a simple way to track the changes made to the app. By using a `state.set('some.state', 'foo')` API instead of `some.state = 'foo'` this control becomes more intuitive as you have a specific API for making changes, rather than "changing stuff all over". It also makes it a lot easier to implement tracking of any changes
+- **Control changes**. I want a simple way to control the changes made to the app. By using a `state.set('some.state', 'foo')` API instead of `some.state = 'foo'` this control becomes more intuitive as you have a specific API for making changes, rather than "changing stuff all over". It also makes it a lot easier to implement tracking of any changes
 
 - **Fast updates**. Immutability has benefits like being able to replay state changes, undo/redo very easily and no unwanted mutations in other parts of your code. The problem though is that immutability is slow on instantiating large datasets
 
