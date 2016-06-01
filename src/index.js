@@ -119,19 +119,13 @@ function StateTree(initialState) {
     });
   }
 
-  function hasChanged(path, changes) {
-    return path.split('.').reduce(function (changes, key) {
-      return changes ? changes[key] : false;
-    }, changes);
-  }
-
   return {
     get: function (path) {
       path = path ? path.split('.') : [];
       return getByPath(path, state);
     },
     set: function (path, value) {
-      var pathArray = path.split('.');
+      var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
       cleanReferences(host[key], state, path.split('.'));
@@ -139,21 +133,21 @@ function StateTree(initialState) {
       updateChanges(host, key, path);
     },
     push: function (path, value) {
-      var pathArray = path.split('.');
+      var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
       var length = host[key].push(setReferences(value, pathArray.concat(key, [[host[key], value]])));
       updateChanges(host[key], String(length - 1), path);
     },
     unshift: function (path, value) {
-      var pathArray = path.split('.');
+      var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
       var length = host[key].unshift(setReferences(value, pathArray.concat(key, [[host[key], value]])));
       updateChanges(host[key], String(0), path);
     },
     unset: function (path) {
-      var pathArray = path.split('.');
+      var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
       cleanReferences(host[key], state, path.split('.'));
@@ -161,7 +155,7 @@ function StateTree(initialState) {
       updateChanges(host, key, path);
     },
     shift: function (path) {
-      var pathArray = path.split('.');
+      var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
       cleanReferences(host[key][0], state, path.split('.').concat(0));
@@ -173,7 +167,7 @@ function StateTree(initialState) {
       var path = args.shift();
       var fromIndex = args.shift();
       var length = args.shift();
-      var pathArray = path.split('.');
+      var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
       // Clear references on existing items and set update path
@@ -186,7 +180,7 @@ function StateTree(initialState) {
       })));
     },
     pop: function (path) {
-      var pathArray = path.split('.');
+      var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
       var lastIndex = host[key].length - 1;
@@ -204,7 +198,7 @@ function StateTree(initialState) {
         path = arguments[0];
         value = arguments[1];
       }
-      var pathArray = path.split('.');
+      var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
       var child = host[key] || host;
@@ -230,6 +224,12 @@ function StateTree(initialState) {
     },
   };
 };
+
+function hasChanged(path, changes) {
+  return path.split('.').reduce(function (changes, key) {
+    return changes ? changes[key] : false;
+  }, changes);
+}
 
 StateTree.computed = function (deps, cb) {
   var computedHasChanged = true;

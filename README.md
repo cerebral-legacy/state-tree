@@ -131,6 +131,8 @@ const tree = StateTree({
 });
 
 tree.set('foo', 'bar2');
+// You can also use arrays for the path
+tree.set(['foo'], 'bar2');
 tree.merge('foo', {something: 'cool'});
 tree.unset('foo');
 tree.push('list', 'something');
