@@ -2,12 +2,14 @@
   "name": "state-tree",
   "version": "0.1.18",
   "description": "A state tree that handles reference updates and lets you flush a description of changes",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "nodeunit tests"
+    "test": "nodeunit tests",
+    "build": "tsc",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -24,6 +26,7 @@
   },
   "homepage": "https://github.com/christianalfoni/state-tree#readme",
   "devDependencies": {
-    "nodeunit": "^0.9.1"
+    "nodeunit": "^0.9.1",
+    "typescript": "^1.8.10"
   }
 }
