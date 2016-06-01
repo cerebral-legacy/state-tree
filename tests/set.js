@@ -45,7 +45,7 @@ exports['should show change on referenced set'] = function (test) {
   test.done();
 };
 
-exports['should show change on nested set'] = function (test) {
+exports['should show change on nested array set'] = function (test) {
   var obj = { foo: 'bar' };
   var lib = Lib({
     foo: obj,

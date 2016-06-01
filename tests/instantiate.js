@@ -42,14 +42,13 @@ exports['should create reference when object or array is reused'] = function (te
   });
   test.deepEqual(lib.get('foo')['.referencePaths'], [['foo'], ['foo2']]);
   test.deepEqual(lib.get('bar')['.referencePaths'], [['bar'], ['bar2']]);
-  test.deepEqual(lib.get('foo2')['.referencePaths'], [['foo'], ['foo2']]);
-  test.deepEqual(lib.get('bar2')['.referencePaths'], [['bar'], ['bar2']]);
+  test.equal(lib.get('foo'), lib.get('foo2'));
+  test.equal(lib.get('bar'), lib.get('bar2'));
   test.done();
 };
 
 exports['should create reference correctly from within an array'] = function (test) {
   var obj = {foo: 'bar'};
-  var array = [];
   var lib = Lib({
     list: [{
       user: obj
