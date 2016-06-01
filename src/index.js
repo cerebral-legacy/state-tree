@@ -299,8 +299,12 @@ StateTree.computed = function (deps, cb) {
       if (computedHasChanged) {
         computedHasChanged = false;
         value = cb(Object.keys(deps).reduce(function (props, key) {
-          var path = deps[key].split('.');
-          props[key] = getByPath(path, passedState);
+          if (typeof deps[key] === 'string') {
+            var path = deps[key].split('.');
+            props[key] = getByPath(path, passedState);
+          } else {
+            props[key] = deps[key].get(passedState);
+          }
           return props;
         }, {}));
         return value;
