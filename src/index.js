@@ -121,7 +121,7 @@ function StateTree(initialState) {
 
   return {
     get: function (path) {
-      path = path ? path.split('.') : [];
+      path = path ? typeof path === 'string' ? path.split('.') : path : [];
       return getByPath(path, state);
     },
     set: function (path, value) {
