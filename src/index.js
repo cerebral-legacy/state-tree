@@ -1,19 +1,24 @@
 var subscribers = [];
 
 function getByPath(path, state, forcePath) {
-  return path.reduce(function (currentPath, key, index) {
+  var currentPath = state;
+  for (var x = 0; x < path.length; x++) {
+    var key = path[x];
     if (forcePath && currentPath[key] === undefined) {
       var newBranch = {};
       Object.defineProperty(newBranch, '.referencePaths', {
         writable: true,
         configurable: true,
-        value: [path.slice().splice(0, index + 1)]
+        value: [path.slice().splice(0, x + 1)]
       });
       currentPath[key] = newBranch;
     }
-
-    return currentPath[key];
-  }, state);
+    if (currentPath[key] === undefined) {
+      return currentPath[key];
+    }
+    currentPath = currentPath[key];
+  }
+  return currentPath;
 }
 
 function cleanReferences(rootObj, state, originPath) {

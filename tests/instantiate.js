@@ -58,3 +58,9 @@ exports['should create reference correctly from within an array'] = function (te
   test.deepEqual(lib.get('list.0.user')['.referencePaths'], [['list', [[{user: obj}], {user: obj}], 'user']]);
   test.done();
 };
+
+exports['should be able to get undefined from paths that are not in tree'] = function (test) {
+  var lib = Lib({});
+  test.equals(lib.get('some.path'), undefined);
+  test.done();
+};
