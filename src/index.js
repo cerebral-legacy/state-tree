@@ -99,7 +99,7 @@ function StateTree(initialState) {
   var state = setReferences(initialState, []);
   var changes = {};
 
-  function updateChanges(host, key, specificPath) {
+  function updateChanges(host, key) {
     function update(pathArray) {
       return function (currentPath, key, index) {
         if (Array.isArray(key)) {
@@ -125,15 +125,16 @@ function StateTree(initialState) {
       return getByPath(path, state);
     },
     set: function (path, value) {
-      var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
+      var pathArray = typeof path === 'string' ? path.split('.') : path;
+      var originalPath = pathArray.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
-      cleanReferences(host[key], state, path.split('.'));
+      cleanReferences(host[key], state, originalPath);
       host[key] = setReferences(value, pathArray.concat(key));
-      updateChanges(host, key, path);
+      updateChanges(host, key);
     },
     push: function (path, value) {
-      var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
+      var pathArray = typeof path === 'string' ? path.split('.') : path;
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
       var length = host[key].push(setReferences(value, pathArray.concat(key, [[host[key], value]])));
@@ -144,49 +145,53 @@ function StateTree(initialState) {
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
       var length = host[key].unshift(setReferences(value, pathArray.concat(key, [[host[key], value]])));
-      updateChanges(host[key], String(0), path);
+      updateChanges(host[key], String(0));
     },
     unset: function (path) {
-      var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
+      var pathArray = typeof path === 'string' ? path.split('.') : path;
+      var originalPath = pathArray.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
-      cleanReferences(host[key], state, path.split('.'));
+      cleanReferences(host[key], state, originalPath);
       delete host[key];
-      updateChanges(host, key, path);
+      updateChanges(host, key);
     },
     shift: function (path) {
       var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
+      var originalPath = pathArray.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
-      cleanReferences(host[key][0], state, path.split('.').concat(0));
+      cleanReferences(host[key][0], state, originalPath.concat(0));
       host[key].shift();
-      updateChanges(host[key], String(0), path);
+      updateChanges(host[key], String(0));
     },
     splice: function () {
       var args = [].slice.call(arguments);
       var path = args.shift();
       var fromIndex = args.shift();
       var length = args.shift();
-      var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
+      var pathArray = typeof path === 'string' ? path.split('.') : path;
+      var originalPath = pathArray.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
       // Clear references on existing items and set update path
       for (var x = fromIndex; x < fromIndex + length; x++) {
-        cleanReferences(host[key][x], state, path.split('.').concat(x));
-        updateChanges(host[key], String(x), path);
+        cleanReferences(host[key][x], state, originalPath.slice().concat(x));
+        updateChanges(host[key], String(x));
       }
       host[key].splice.apply(host[key], [fromIndex, length].concat(args.map(function (arg) {
-        return setReferences(arg, pathArray.concat(key, [[host[key], arg]]));
+        return setReferences(arg, pathArray.slice().concat(key, [[host[key], arg]]));
       })));
     },
     pop: function (path) {
       var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
+      var originalPath = pathArray.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
       var lastIndex = host[key].length - 1;
-      cleanReferences(host[key][lastIndex], state, path.split('.').concat(lastIndex));
+      cleanReferences(host[key][lastIndex], state, originalPath.concat(lastIndex));
       host[key].pop();
-      updateChanges(host[key], String(lastIndex), path);
+      updateChanges(host[key], String(lastIndex));
     },
     merge: function () {
       var path;
@@ -199,13 +204,14 @@ function StateTree(initialState) {
         value = arguments[1];
       }
       var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
+      var originalPath = pathArray.slice();
       var key = pathArray.pop();
       var host = getByPath(pathArray, state);
       var child = host[key] || host;
       Object.keys(value).forEach(function (mergeKey) {
-        cleanReferences(child[mergeKey], state, key ? path.split('.').concat(mergeKey) : [mergeKey]);
-        child[mergeKey] = setReferences(value[mergeKey], key ? pathArray.concat(key, mergeKey) : [mergeKey]);
-        updateChanges(child, mergeKey, path);
+        cleanReferences(child[mergeKey], state, key ? originalPath.slice().concat(mergeKey) : [mergeKey]);
+        child[mergeKey] = setReferences(value[mergeKey], key ? pathArray.slice().concat(key, mergeKey) : [mergeKey]);
+        updateChanges(child, mergeKey);
       });
     },
     subscribe: function (cb) {
