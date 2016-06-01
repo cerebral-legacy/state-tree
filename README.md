@@ -225,6 +225,7 @@ So, this seems like a lot of code to make computed work, but again, this is low 
 ```js
 import React from 'react';
 import HOC from 'state-tree/react/HOC';
+import {computed} from 'state-tree';
 import addItem from './addItem';
 
 const awesomeItems = computed({

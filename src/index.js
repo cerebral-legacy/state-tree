@@ -228,45 +228,41 @@ function StateTree(initialState) {
       });
       return flushedChanges;
     },
-    computed: function (deps, cb) {
-      var computedHasChanged = true;
-      var value = null;
-      return {
-        get: function (passedState) {
-          if (computedHasChanged) {
-            computedHasChanged = false;
-            value = cb(Object.keys(deps).reduce(function (props, key) {
-              var path = deps[key].split('.');
-              props[key] = getByPath(path, passedState);
-              return props;
-            }, {}));
-            return value;
-          } else {
-            return value;
-          }
-        },
-        // Can optimize by remembering the changes in case multiple
-        // components checks the computed, but very unlikely
-        hasChanged: function (changes) {
-          if (computedHasChanged) {
-            return true;
-          }
-          for (var key in deps) {
-            if (hasChanged(deps[key], changes)) {
-              computedHasChanged = true;
-              return true;
-            }
-          }
-          return false;
-        }
-      }
-    }
   };
 };
 
-/*
-- Create computed
-- ComponentWillMount, subscribe to computed
-*/
+StateTree.computed = function (deps, cb) {
+  var computedHasChanged = true;
+  var value = null;
+  return {
+    get: function (passedState) {
+      if (computedHasChanged) {
+        computedHasChanged = false;
+        value = cb(Object.keys(deps).reduce(function (props, key) {
+          var path = deps[key].split('.');
+          props[key] = getByPath(path, passedState);
+          return props;
+        }, {}));
+        return value;
+      } else {
+        return value;
+      }
+    },
+    // Can optimize by remembering the changes in case multiple
+    // components checks the computed, but very unlikely
+    hasChanged: function (changes) {
+      if (computedHasChanged) {
+        return true;
+      }
+      for (var key in deps) {
+        if (hasChanged(deps[key], changes)) {
+          computedHasChanged = true;
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+}
 
 module.exports = StateTree;
