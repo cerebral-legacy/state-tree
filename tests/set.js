@@ -55,3 +55,12 @@ exports['should show change on nested set'] = function (test) {
   test.deepEqual(lib.flushChanges(), { foo: { foo: true }, bar: { 1: { foo: true } } });
   test.done();
 };
+
+exports['should be able to set paths that does not exist'] = function (test) {
+  var lib = Lib({});
+  lib.set('foo.bar.test', 'bar2');
+  test.deepEqual(lib.get(), {foo: { bar: { test: 'bar2' } } });
+  test.deepEqual(lib.get('foo')['.referencePaths'], [['foo']]);
+  test.deepEqual(lib.get('foo.bar')['.referencePaths'], [['foo', 'bar']]);
+  test.done();
+};

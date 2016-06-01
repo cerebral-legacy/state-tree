@@ -1,7 +1,17 @@
 var subscribers = [];
 
-function getByPath(path, state) {
-  return path.reduce(function (currentPath, key) {
+function getByPath(path, state, forcePath) {
+  return path.reduce(function (currentPath, key, index) {
+    if (forcePath && currentPath[key] === undefined) {
+      var newBranch = {};
+      Object.defineProperty(newBranch, '.referencePaths', {
+        writable: true,
+        configurable: true,
+        value: [path.slice().splice(0, index + 1)]
+      });
+      currentPath[key] = newBranch;
+    }
+
     return currentPath[key];
   }, state);
 }
@@ -128,7 +138,7 @@ function StateTree(initialState) {
       var pathArray = typeof path === 'string' ? path.split('.') : path;
       var originalPath = pathArray.slice();
       var key = pathArray.pop();
-      var host = getByPath(pathArray, state);
+      var host = getByPath(pathArray, state, true);
       cleanReferences(host[key], state, originalPath);
       host[key] = setReferences(value, pathArray.concat(key));
       updateChanges(host, key);
@@ -206,7 +216,7 @@ function StateTree(initialState) {
       var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
       var originalPath = pathArray.slice();
       var key = pathArray.pop();
-      var host = getByPath(pathArray, state);
+      var host = getByPath(pathArray, state, true);
       var child = host[key] || host;
       Object.keys(value).forEach(function (mergeKey) {
         cleanReferences(child[mergeKey], state, key ? originalPath.slice().concat(mergeKey) : [mergeKey]);
