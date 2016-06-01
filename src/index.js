@@ -319,7 +319,10 @@ StateTree.computed = function (deps, cb) {
         return true;
       }
       for (var key in deps) {
-        if (hasChanged(deps[key], changes)) {
+        if (
+          (typeof deps[key] === 'string' && hasChanged(deps[key], changes)) ||
+          (typeof deps[key] !== 'string' && deps[key].hasChanged(changes))
+        ) {
           computedHasChanged = true;
           return true;
         }
