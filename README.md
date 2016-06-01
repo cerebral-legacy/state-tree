@@ -130,16 +130,19 @@ const tree = StateTree({
   list: []
 });
 
-tree.set('foo', 'bar2');
 // You can also use arrays for the path
 tree.set(['foo'], 'bar2');
+
+tree.set('foo', 'bar2');
 tree.merge('foo', {something: 'cool'});
+tree.import({foo: 'bar', deeply: {nested: 'foo'}}); // Deep merging
 tree.unset('foo');
 tree.push('list', 'something');
 tree.pop('list');
 tree.shift('list');
 tree.unshift('list', 'someValue');
 tree.splice('list', 0, 1, 'newValue');
+tree.concat('list', ['something']);
 ```
 
 #### Flushing changes

@@ -214,6 +214,60 @@ function StateTree(initialState) {
         updateChanges(child, mergeKey);
       });
     },
+    concat: function () {
+      var args = [].slice.call(arguments);
+      var path = args.shift();
+      var pathArray = typeof path === 'string' ? path.split('.') : path.slice();
+      var key = pathArray.pop();
+      var host = getByPath(pathArray, state);
+      host[key] = host[key].concat.apply(host[key], args.map(function (arg) {
+        return setReferences(arg, pathArray.slice().concat(key, [[host[key], arg]]));
+      }));
+      updateChanges(host, key);
+    },
+    import: function (value) {
+      function deepmerge(target, src) {
+        var array = Array.isArray(src);
+        var dst = array && [] || {};
+
+        if (array) {
+          target = target || [];
+          dst = src.slice();
+          src.forEach(function(e, i) {
+          if (typeof dst[i] === 'undefined') {
+            dst[i] = e;
+          } else if (typeof e === 'object') {
+            dst[i] = deepmerge(target[i], e);
+          }
+         });
+        } else {
+          if (target && typeof target === 'object') {
+            Object.keys(target).forEach(function (key) {
+              dst[key] = target[key];
+            })
+          }
+
+          Object.keys(src).forEach(function (key) {
+            if (typeof src[key] !== 'object' || !src[key]) {
+              dst[key] = src[key];
+            } else {
+              if (!target[key]) {
+                dst[key] = src[key];
+              } else {
+                dst[key] = deepmerge(target[key], src[key]);
+              }
+            }
+          });
+        }
+
+        return dst;
+      };
+      cleanReferences(state, state, []);
+      state = deepmerge(state, value);
+      Object.keys(state).forEach(function (key) {
+        state[key] = setReferences(state[key], [key]);
+      });
+    },
     subscribe: function (cb) {
       subscribers.push(cb);
     },
