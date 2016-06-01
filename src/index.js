@@ -232,12 +232,12 @@ function StateTree(initialState) {
       var computedHasChanged = true;
       var value = null;
       return {
-        get: function (changes) {
+        get: function (passedState) {
           if (computedHasChanged) {
             computedHasChanged = false;
             value = cb(Object.keys(deps).reduce(function (props, key) {
               var path = deps[key].split('.');
-              props[key] = getByPath(path, state);
+              props[key] = getByPath(path, passedState);
               return props;
             }, {}));
             return value;

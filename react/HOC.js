@@ -31,7 +31,7 @@ module.exports = function (Component, paths) {
       var tree = this.context.tree;
       var props = this.props || {};
       var propsToPass = Object.keys(paths || {}).reduce(function (props, key) {
-        props[key] = typeof paths[key] === 'object' ? paths[key].get() : tree.get(paths[key]);
+        props[key] = typeof paths[key] === 'object' ? paths[key].get(tree.get()) : tree.get(paths[key]);
         return props
       }, {})
 

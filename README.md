@@ -212,13 +212,13 @@ const myComputed = tree.computed({
   return state.foo + '!!!';
 });
 
-myComputed.get() // "bar!!!"
+myComputed.get(tree) // "bar!!!"
 let changes = tree.flushChanges(); // {}
 myComputed.hasChanged(changes); // false
 tree.set('foo', 'bar2');
 changes = tree.flushChanges(); // { foo: true }
 myComputed.hasChanged(changes); // true
-myComputed.get() // "bar2!!!"
+myComputed.get(tree) // "bar2!!!"
 ```
 So, this seems like a lot of code to make computed work, but again, this is low level. Implemented in the HOC of React you can simply do this.
 
@@ -226,7 +226,12 @@ So, this seems like a lot of code to make computed work, but again, this is low 
 import React from 'react';
 import HOC from 'state-tree/react/HOC';
 import addItem from './addItem';
-import awesomeItems from './computed/awesomeItems';
+
+const awesomeItems = computed({
+  list: 'list' // Define its deps
+}, state => {
+  return state.list.filter(item => item.isAwesome);
+});
 
 function Items(props) {
   return (
@@ -242,16 +247,6 @@ function Items(props) {
 export default HOC(Items, {
   list: awesomeItems
 })
-```
-And *awesomeItems.js* would look like:
-```js
-import tree from './tree';
-
-export default tree.computed({
-  list: 'list' // Define its deps
-}, state => {
-  return state.list.filter(item => item.isAwesome);
-});
 ```
 
 There is no magic going on here. The components will pass in the flushed "change tree" to whatever computed they have. This is what tells them to verify if an update is necessary, if not already ready to calculate a new value.
