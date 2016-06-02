@@ -1,4 +1,4 @@
-var Lib = require('../src');
+var Lib = require('../');
 
 function log(obj) {
   console.log(JSON.stringify(obj, null, 2))
