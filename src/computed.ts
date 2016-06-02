@@ -1,15 +1,8 @@
 import { getByPath } from './utils'
 
 class Computed {
-  static getByPath
-  private _deps
-  private _cb
-
-  constructor (_deps, _cb) {
-    if (!(this instanceof Computed)) return new Computed(_deps, _cb)
-    this._deps = _deps
-    this._cb = _cb
-  }
+  static getByPath = getByPath
+  constructor (private _deps, private _cb) { }
 
   getDepsMap () {
     return this._deps
@@ -28,7 +21,5 @@ class Computed {
   }
 
 }
-
-Computed.getByPath = getByPath
 
 export default Computed

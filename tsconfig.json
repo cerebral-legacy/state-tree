@@ -10,6 +10,7 @@
   "exclude": [
     "node_modules",
     "lib",
-    "tests"
+    "tests",
+    "index.d.ts"
   ]
 }

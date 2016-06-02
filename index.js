@@ -1,5 +1,11 @@
-// keep backward compatibility
+// class factories exported as CommonJS module "default"
 var StateTree = require('./lib/stateTree').default
-StateTree.computed = require('./lib/computed').default
+var Computed = require('./lib/computed').default
 
-module.exports = StateTree
+module.exports = function (initialState) {
+  return new StateTree(initialState)
+}
+
+module.exports.computed = function (deps, cb) {
+  return new Computed(deps, cb)
+}

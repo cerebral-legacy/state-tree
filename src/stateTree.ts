@@ -4,19 +4,16 @@ import { deepmerge, getByPath } from './utils'
 export type Callback = (changes: any) => void
 
 class StateTree {
+  static setReferences = setReferences
+  static cleanReferences = cleanReferences
+  static getByPath = getByPath
+
   private _state: any
-  private _subscribers: Callback[]
-  private _changes: any
-  static setReferences
-  static cleanReferences
-  static getByPath
+  private _subscribers: Callback[] = []
+  private _changes: any = {}
 
   constructor (initialState: any) {
-    if (!(this instanceof StateTree)) return new StateTree(initialState)
-
     this._state = StateTree.setReferences(initialState, [])
-    this._changes = {}
-    this._subscribers = []
   }
   
   private _updateChanges(host, key) {
@@ -179,9 +176,5 @@ class StateTree {
     return flushedChanges
   }
 }
-
-StateTree.setReferences = setReferences
-StateTree.cleanReferences = cleanReferences
-StateTree.getByPath = getByPath 
 
 export default StateTree
