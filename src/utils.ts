@@ -55,9 +55,3 @@ export function deepmerge(target, src) {
 
   return dst
 }
-
-export function hasChanged(path, changes) {
-  return path.split('.').reduce(function (changes, key) {
-    return changes ? changes[key] : false
-  }, changes)
-}
