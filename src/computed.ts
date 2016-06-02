@@ -5,13 +5,15 @@ class Computed {
   static hasChanged
   private _value
   private _computedHasChanged
+  private _deps
+  private _cb
 
-  constructor (private _deps, private _cb) {
+  constructor (_deps, _cb) {
     if (!(this instanceof Computed)) return new Computed(_deps, _cb)
-
     this._computedHasChanged = true
     this._value = null
     this._deps = _deps
+    this._cb = _cb
   }
 
   getDepsMap () {
