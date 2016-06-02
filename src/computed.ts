@@ -11,6 +11,11 @@ class Computed {
 
     this._computedHasChanged = true
     this._value = null
+    this._deps = _deps
+  }
+
+  getDepsMap () {
+    return this._deps
   }
 
   get (passedState) {
