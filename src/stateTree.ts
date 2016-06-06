@@ -15,7 +15,7 @@ class StateTree {
   constructor (initialState: any) {
     this._state = StateTree.setReferences(initialState, [])
   }
-  
+
   private _updateChanges(host, key) {
     function update(pathArray) {
       return function (currentPath, key, index) {

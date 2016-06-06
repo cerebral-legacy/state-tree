@@ -1,6 +1,6 @@
 {
   "name": "state-tree",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "description": "A state tree that handles reference updates and lets you flush a description of changes",
   "main": "index.js",
   "typings": "index.d.ts",
