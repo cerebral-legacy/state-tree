@@ -64,3 +64,23 @@ exports['should be able to set paths that does not exist'] = function (test) {
   test.deepEqual(lib.get('foo.bar')['.referencePaths'], [['foo', 'bar']]);
   test.done();
 };
+
+exports['should throw error when setting functions'] = function (test) {
+  var lib = Lib({});
+  test.throws(function () {
+    lib.set('foo.bar.test', function () {});
+  })
+  test.done();
+}
+
+/*
+exports['should allow to override paths'] = function (test) {
+  var lib = Lib({
+    foo: 'bar'
+  });
+  var obj = {}
+  lib.set('foo.bar', obj)
+  test.ok(obj['.referencePaths']);
+  test.done();
+};
+*/

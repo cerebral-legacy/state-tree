@@ -56,6 +56,9 @@ export function cleanReferences(rootObj, state, originPath) {
 
 export function setReferences(rootObj, basePath) {
   function traverse(obj, path) {
+    if (typeof obj === 'function') {
+      throw new Error('You can not pass functions into the state tree. This happens on path: ' + path)
+    }
     if (Array.isArray(obj)) {
       Object.defineProperty(obj, '.referencePaths', {
         writable: true,
