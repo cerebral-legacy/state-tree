@@ -73,6 +73,25 @@ exports['should throw error when setting functions'] = function (test) {
   test.done();
 }
 
+exports['should be able to set new object'] = function(test) {
+  var lib = Lib({ baz: { foo: 'foo', bar: 'bar' } });
+  lib.set('baz', { foo: 'foo2', bar: 'bar2' });
+  test.deepEqual(lib.get('baz'), { foo: 'foo2', bar: 'bar2' });
+  test.done();
+};
+
+exports['checking change results of multiple subsequent sets'] = function(test) {
+  var lib = Lib({ baz: { foo: 'foo', bar: 'bar' } });
+  lib.set('baz', { foo: 'foo2', bar: 'bar2' });
+  test.deepEqual(lib.flushChanges(), { baz: true });
+  lib.set('baz.foo', '');
+  test.deepEqual(lib.flushChanges(), { baz: { foo: true } });
+  lib.set('baz', { foo: 'foo3', bar: 'bar2' });
+  test.deepEqual(lib.flushChanges(), { baz: true });
+  test.done();
+};
+
+
 /*
 exports['should allow to override paths'] = function (test) {
   var lib = Lib({
